@@ -1,0 +1,11 @@
+version: "3"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./build/docker/server/Dockerfile
+    ports:
+      - target: 3000
+        published: ${WEB_PORT:-3000}
+        protocol: tcp
+        mode: host
