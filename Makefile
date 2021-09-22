@@ -8,6 +8,7 @@ GO_CLEAN	= $(GO) clean
 GO_TOOL		= $(GO) tool
 GO_VET		= $(GO) vet
 GO_FMT		= $(GO) fmt
+GO_GEN		= $(GO) generate
 GOLINT		= golint
 
 DOCKER		= docker
@@ -42,15 +43,19 @@ initialize:
 ## Build
 run:
 	$(GO_RUN) $(MAIN_GO)
-build: build-client build-server docker-build
+build: build-client build-server
 build-client:
 	$(GO_BUILD) -o $(BIN_DIR)$(CLIENT_BIN) $(CLIENT_SRC)
 build-server:
 	$(GO_BUILD) -o $(BIN_DIR)$(SERVER_BIN) $(SERVER_SRC)
-
 clean:
 	$(GO_CLEAN)
 	@rm -rf $(BIN_DIR)$(BIN_NAME)
+
+gen: clean-gen
+	$(GO_GEN) ./...
+clean-gen: $(PB_GO_SRCS)
+	@find . -type f -name *.pb.go -exec rm {} \;
 
 ## Test
 test:
@@ -67,6 +72,7 @@ fmt:
 	$(GO_FMT) ./...
 
 ## Docker
+docker: docker-build
 docker-build:
 	$(DC_BUILD) --no-cache --force-rm
 up:
